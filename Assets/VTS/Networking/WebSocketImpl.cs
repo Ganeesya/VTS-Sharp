@@ -1,11 +1,11 @@
-﻿using UnityEngine;
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Net.WebSockets;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 
 namespace VTS.Networking.Impl{
     public class WebSocketImpl : IWebSocket
@@ -37,14 +37,14 @@ namespace VTS.Networking.Impl{
         public async Task Connect(string URL, System.Action onConnect, System.Action onError)
         {
             Uri serverUri = new Uri(URL);
-            Debug.Log("Connecting to: " + serverUri);
+            Debug.Print("Connecting to: " + serverUri);
             await _ws.ConnectAsync(serverUri, CancellationToken.None);
             while(IsConnecting())
             {
-                Debug.Log("Waiting to connect...");
+                Debug.Print("Waiting to connect...");
                 Task.Delay(50).Wait();
             }
-            Debug.Log("Connect status: " + _ws.State);
+            Debug.Print("Connect status: " + _ws.State);
             if(_ws.State == WebSocketState.Open){
                 onConnect();
             }else{
@@ -68,21 +68,21 @@ namespace VTS.Networking.Impl{
         public void Send(string message)
         {
             byte[] buffer = ENCODER.GetBytes(message);
-            // Debug.Log("Message to queue for send: " + buffer.Length + ", message: " + message);
+            // Debug.Print("Message to queue for send: " + buffer.Length + ", message: " + message);
             ArraySegment<byte> sendBuf = new ArraySegment<byte>(buffer);
             SendQueue.Add(sendBuf);
         }
 
         private async void RunSend()
         {
-            Debug.Log("WebSocket Message Sender looping.");
+            Debug.Print("WebSocket Message Sender looping.");
             ArraySegment<byte> msg;
             while (true)
             {
                 while (!SendQueue.IsCompleted && this.IsConnectionOpen())
                 {
                     msg = SendQueue.Take();
-                    // Debug.Log("Dequeued this message to send: " + msg);
+                    // Debug.Print("Dequeued this message to send: " + msg);
                     await _ws.SendAsync(msg, WebSocketMessageType.Text, true /* is last part of message */, CancellationToken.None);
                 }
             }
@@ -103,7 +103,7 @@ namespace VTS.Networking.Impl{
                 {
                     chunkResult = await _ws.ReceiveAsync(arrayBuf, CancellationToken.None);
                     ms.Write(arrayBuf.Array, arrayBuf.Offset, chunkResult.Count);
-                    //Debug.Log("Size of Chunk message: " + chunkResult.Count);
+                    //Debug.Print("Size of Chunk message: " + chunkResult.Count);
                     if ((UInt64)(chunkResult.Count) > MAX_READ_SIZE)
                     {
                         Console.Error.WriteLine("Warning: Message is bigger than expected!");
@@ -121,7 +121,7 @@ namespace VTS.Networking.Impl{
 
         private async void RunReceive()
         {
-            Debug.Log("WebSocket Message Receiver looping.");
+            Debug.Print("WebSocket Message Receiver looping.");
             string result;
             while (true)
             {

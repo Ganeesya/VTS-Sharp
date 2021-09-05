@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
-using UnityEngine;
 using VTS.Networking;
 using VTS.Models;
 
@@ -10,17 +10,15 @@ namespace VTS {
     /// 
     /// This implementation will attempt to Authenticate on Awake.
     /// </summary>
-    [RequireComponent(typeof(VTSWebSocket))]
-    public abstract class VTSPlugin : MonoBehaviour
+    public abstract class VTSPlugin 
     {
-        [SerializeField]
         protected string _pluginName = "ExamplePlugin";
         /// <summary>
         /// The name of this plugin.
         /// </summary>
         /// <value></value>
         public string PluginName { get { return this._pluginName; } }
-        [SerializeField]
+
         protected string _pluginAuthor = "ExampleAuthor";
         /// <summary>
         /// The name of this plugin's author. 
@@ -47,18 +45,18 @@ namespace VTS {
         /// </summary>
         /// <param name="webSocket">The websocket implementation.</param>
         /// <param name="jsonUtility">Thge JSON serializer/deserializer implementation.</param>
-        public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility){
-            this._socket = GetComponent<VTSWebSocket>();
+        public void Initialize(VTSWebSocket vts,IWebSocket webSocket, IJsonUtility jsonUtility){
+            this._socket = vts;
             this._socket.Initialize(webSocket, jsonUtility);
             // TODO: clean this way the hell up.
             this._socket.Connect(() => {
                 Authenticate(
-                    (r) => { Debug.Log(r); }, 
-                    (r) => { Debug.LogError(r); }
+                    (r) => { Debug.Print(r.ToString()); }, 
+                    (r) => { Debug.Print(r.ToString()); }
                 );
             },
             () => { 
-                Debug.LogError("Unable to connect ");
+                Debug.Print("Unable to connect ");
             });
         }
 
@@ -127,7 +125,7 @@ namespace VTS {
         /// <param name="onError">Callback executed upon receiving an error.</param>
         public void GetCurrentModel(Action<VTSCurrentModelData> onSuccess, Action<VTSErrorData> onError){
             VTSCurrentModelData request = new VTSCurrentModelData();
-            Debug.Log(request);
+            Debug.Print(request.ToString());
             this._socket.Send<VTSCurrentModelData>(request, onSuccess, onError);
         }
 
@@ -227,14 +225,9 @@ namespace VTS {
         /// <param name="matcher">The ArtMesh matcher search parameters.</param>
         /// <param name="onSuccess">Callback executed upon receiving a response.</param>
         /// <param name="onError">Callback executed upon receiving an error.</param>
-        public void TintArtMesh(Color32 tint, ArtMeshMatcher matcher, Action<VTSColorTintData> onSuccess, Action<VTSErrorData> onError){
+        public void TintArtMesh(ColorTint tint, ArtMeshMatcher matcher, Action<VTSColorTintData> onSuccess, Action<VTSErrorData> onError){
             VTSColorTintData request = new VTSColorTintData();
-            ColorTint colorTint = new ColorTint();
-            colorTint.colorA = tint.a;
-            colorTint.colorB = tint.b;
-            colorTint.colorG = tint.g;
-            colorTint.colorR = tint.r;
-            request.data.colorTint = colorTint;
+            request.data.colorTint = tint;
             request.data.artMeshMatcher = matcher;
             this._socket.Send<VTSColorTintData>(request, onSuccess, onError);
         }

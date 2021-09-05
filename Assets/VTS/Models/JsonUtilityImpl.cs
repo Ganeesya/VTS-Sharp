@@ -1,14 +1,19 @@
-﻿namespace VTS.Models.Impl{
+﻿using System.Runtime.Serialization.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
+
+namespace VTS.Models.Impl{
     public class JsonUtilityImpl : IJsonUtility
     {
         public T FromJson<T>(string json)
         {
-            return UnityEngine.JsonUtility.FromJson<T>(json);
+            return JsonSerializer.Deserialize<T>(json);
         }
 
         public string ToJson(object obj)
         {
-            return UnityEngine.JsonUtility.ToJson(obj);
+            return JsonSerializer.Serialize(obj);
         }
     }
 }

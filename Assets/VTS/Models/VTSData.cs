@@ -1,14 +1,16 @@
 ﻿using System;
 
 namespace VTS.Models {
+
+    [System.Serializable]
     public class VTSMessageData
     {
-        public string apiName = "VTubeStudioPublicAPI";
-        public string apiVersion = "1.0";
-        public string requestID = Guid.NewGuid().ToString();
-        public string messageType;
+        public string apiName { get; set; } = "VTubeStudioPublicAPI";
+        public string apiVersion { get; set; } = "1.0";
+        public long timestamp { get; set; } = 0L;
+        public string requestID { get; set; } = Guid.NewGuid().ToString();
+        public string messageType { get; set; }="";
     }
-
     
     [System.Serializable]
     public class VTSErrorData : VTSMessageData{
@@ -16,12 +18,12 @@ namespace VTS.Models {
             this.messageType = "APIError";
             this.data = new Data();
         }
-        public Data data;
+        public Data data { get; set; }
 
         [System.Serializable]
         public class Data {
-            public ErrorID errorID;
-            public string message;
+            public ErrorID errorID { get; set; }
+            public string message { get; set; }
         }
     }
 
@@ -31,13 +33,13 @@ namespace VTS.Models {
             this.messageType = "APIStateRequest";
             this.data = new Data();
         }
-        public Data data;
+        public Data data { get; set; }
 
         [System.Serializable]
         public class Data{
-            public bool active;
-            public string vTubeStudioVersion;
-            public bool currentSessionAuthenticated;
+            public bool active { get; set; }
+            public string vTubeStudioVersion { get; set; }
+            public bool currentSessionAuthenticated { get; set; }
         }
     }
 
@@ -47,14 +49,14 @@ namespace VTS.Models {
             this.messageType = "AuthenticationTokenRequest";
             this.data = new Data();
         }
-        public Data data;
+        public Data data { get; set; }
 
         [System.Serializable]
         public class Data {
-            public string pluginName;
-            public string pluginDeveloper;
-            public string pluginIcon;
-            public string authenticationToken;
+            public string pluginName { get; set; }
+            public string pluginDeveloper { get; set; }
+            public string pluginIcon { get; set; }
+            public string authenticationToken { get; set; }
         }
     }
 
@@ -64,18 +66,18 @@ namespace VTS.Models {
             this.messageType = "StatisticsRequest";
             this.data = new Data();
         }
-        public Data data;
+        public Data data { get; set; }
 
         [System.Serializable]
         public class Data {
-            public long uptime;
-		    public int framerate;
-		    public int allowedPlugins;
-		    public int connectedPlugins;
-		    public bool startedWithSteam;
-		    public int windowWidth;
-		    public int windowHeight;
-		    public bool windowIsFullscreen;
+            public long uptime { get; set; }
+            public int framerate { get; set; }
+            public int allowedPlugins { get; set; }
+            public int connectedPlugins { get; set; }
+            public bool startedWithSteam { get; set; }
+            public int windowWidth { get; set; }
+            public int windowHeight { get; set; }
+            public bool windowIsFullscreen { get; set; }
         }
     }
 
@@ -85,34 +87,34 @@ namespace VTS.Models {
             this.messageType = "VTSFolderInfoRequestuest";
             this.data = new Data();
         }
-        public Data data;
+        public Data data { get; set; }
 
         [System.Serializable]
         public class Data {
-            public string models;
-		    public string backgrounds;
-		    public string items;
-		    public string config;
-		    public string logs;
-		    public string backup;
+            public string models { get; set; }
+            public string backgrounds { get; set; }
+            public string items { get; set; }
+            public string config { get; set; }
+            public string logs { get; set; }
+            public string backup { get; set; }
         }
     }
 
     [System.Serializable]
     public class VTSModelData {
-        public bool modelLoaded;
-        public string modelName;
-        public string modelID;
-        public string vtsModelName;
-        public string vtsModelIconName;
+        public bool modelLoaded { get; set; }
+        public string modelName { get; set; }
+        public string modelID { get; set; }
+        public string vtsModelName { get; set; }
+        public string vtsModelIconName { get; set; }
     }
 
     [System.Serializable]
     public class ModelPosition{
-        public float positionX = float.MinValue;
-        public float positionY = float.MinValue;
-        public float rotation = float.MinValue;
-        public float size = float.MinValue;
+        public float positionX { get; set; } = float.MinValue;
+        public float positionY { get; set; } = float.MinValue;
+        public float rotation { get; set; } = float.MinValue;
+        public float size { get; set; } = float.MinValue;
 
     }
 
@@ -122,19 +124,19 @@ namespace VTS.Models {
             this.messageType = "CurrentModelRequest";
             this.data = new Data();
         }
-        public Data data;
+        public Data data { get; set; }
 
         [System.Serializable]
         public class Data : VTSModelData{
-		    public string live2DModelName;
-		    public long modelLoadTime;
-		    public long timeSinceModelLoaded;
-		    public int numberOfLive2DParameters;
-		    public int numberOfLive2DArtmeshes;
-		    public bool hasPhysicsFile;
-		    public int numberOfTextures;
-		    public int textureResolution;
-            public ModelPosition modelPosition;
+		    public string live2DModelName { get; set; }
+            public long modelLoadTime { get; set; }
+            public long timeSinceModelLoaded { get; set; }
+            public int numberOfLive2DParameters { get; set; }
+            public int numberOfLive2DArtmeshes { get; set; }
+            public bool hasPhysicsFile { get; set; }
+            public int numberOfTextures { get; set; }
+            public int textureResolution { get; set; }
+            public ModelPosition modelPosition { get; set; }
 
         }
     }
@@ -145,12 +147,12 @@ namespace VTS.Models {
             this.messageType = "AvailableModelsRequest";
             this.data = new Data();
         }
-        public Data data;
+        public Data data { get; set; }
 
         [System.Serializable]
         public class Data {
-            public int numberOfModels;
-            public VTSModelData[] availableModels;
+            public int numberOfModels { get; set; }
+            public VTSModelData[] availableModels { get; set; }
         }
     }
 
@@ -160,11 +162,11 @@ namespace VTS.Models {
             this.messageType = "ModelLoadRequest";
             this.data = new Data();
         }
-        public Data data;
+        public Data data { get; set; }
 
         [System.Serializable]
         public class Data {
-            public string modelID;
+            public string modelID { get; set; }
         }
     }
 
@@ -174,21 +176,21 @@ namespace VTS.Models {
             this.messageType = "MoveModelRequest";
             this.data = new Data();
         }
-        public Data data;
+        public Data data { get; set; }
 
         [System.Serializable]
         public class Data : ModelPosition {
-            public float timeInSeconds;
-            public bool valuesAreRelativeToModel;
+            public float timeInSeconds { get; set; }
+            public bool valuesAreRelativeToModel { get; set; }
         }
     }
 
     [System.Serializable]
     public class HotkeyData {
-        public string name;
-		public HotkeyAction type;
-		public string file;
-		public string hotkeyID;
+        public string name { get; set; }
+        public HotkeyAction type { get; set; }
+        public string file { get; set; }
+        public string hotkeyID { get; set; }
     }
 
     [System.Serializable]
@@ -197,14 +199,14 @@ namespace VTS.Models {
             this.messageType = "HotkeysInCurrentModelRequest";
             this.data = new Data();
         }
-        public Data data;
+        public Data data { get; set; }
 
         [System.Serializable]
         public class Data {
-            public bool modelLoaded;
-            public string modelName;
-            public string modelID;
-            public HotkeyData[] availableHotkeys;
+            public bool modelLoaded { get; set; }
+            public string modelName { get; set; }
+            public string modelID { get; set; }
+            public HotkeyData[] availableHotkeys { get; set; }
         }
     }
 
@@ -214,11 +216,11 @@ namespace VTS.Models {
             this.messageType = "HotkeyTriggerRequest";
             this.data = new Data();
         }
-        public Data data;
+        public Data data { get; set; }
 
         [System.Serializable]
         public class Data {
-            public string hotkeyID;
+            public string hotkeyID { get; set; }
         }
     }
 
@@ -228,35 +230,35 @@ namespace VTS.Models {
             this.messageType = "ArtMeshListRequest";
             this.data = new Data();
         }
-        public Data data;
+        public Data data { get; set; }
 
         [System.Serializable]
         public class Data {
-            public bool modelLoaded;
-		    public int numberOfArtMeshNames;
-		    public int numberOfArtMeshTags;
-		    public string[] artMeshNames;
-		    public string [] artMeshTags;
+            public bool modelLoaded { get; set; }
+            public int numberOfArtMeshNames { get; set; }
+            public int numberOfArtMeshTags { get; set; }
+            public string[] artMeshNames { get; set; }
+            public string [] artMeshTags { get; set; }
         }
     }
 
     // must be from 1-255
     [System.Serializable]
     public class ColorTint {
-        public byte colorR;
-        public byte colorG;
-        public byte colorB;
-        public byte colorA;
+        public byte colorR { get; set; }
+        public byte colorG { get; set; }
+        public byte colorB { get; set; }
+        public byte colorA { get; set; }
     }
 
     [System.Serializable]
     public class ArtMeshMatcher {
-        public bool tintAll;
-        public int[] artMeshNumber;
-        public string[] nameExact;
-        public string[] nameContains;
-        public string[] tagExact;
-        public string[] tagContains;
+        public bool tintAll { get; set; }
+        public int[] artMeshNumber { get; set; }
+        public string[] nameExact { get; set; }
+        public string[] nameContains { get; set; }
+        public string[] tagExact { get; set; }
+        public string[] tagContains { get; set; }
     }
 
     [System.Serializable]
@@ -265,13 +267,13 @@ namespace VTS.Models {
             this.messageType = "ColorTintRequest";
             this.data = new Data();
         }
-        public Data data;
+        public Data data { get; set; }
 
         [System.Serializable]
         public class Data {
-            public ColorTint colorTint;
-            public ArtMeshMatcher artMeshMatcher;
-            public int matchedArtMeshes;
+            public ColorTint colorTint { get; set; }
+            public ArtMeshMatcher artMeshMatcher { get; set; }
+            public int matchedArtMeshes { get; set; }
         }
     }
 
@@ -281,22 +283,22 @@ namespace VTS.Models {
             this.messageType = "FaceFoundRequest";
             this.data = new Data();
         }
-        public Data data;
+        public Data data { get; set; }
 
         [System.Serializable]
         public class Data {
-            public bool found;
+            public bool found { get; set; }
         }
     }
 
     [System.Serializable]
     public class VTSParameter {
-        public string name;
-        public string addedBy;
-        public float value;
-        public float min;
-        public float max;
-        public float defaultValue;
+        public string name { get; set; }
+        public string addedBy { get; set; }
+        public float value { get; set; }
+        public float min { get; set; }
+        public float max { get; set; }
+        public float defaultValue { get; set; }
     }
 
     [System.Serializable]
@@ -305,15 +307,15 @@ namespace VTS.Models {
             this.messageType = "InputParameterListRequest";
             this.data = new Data();
         }
-        public Data data;
+        public Data data { get; set; }
 
         [System.Serializable]
         public class Data {
-            public bool modelLoaded;
-            public string modelName;
-            public string modelID;
-            public VTSParameter[] customParameters;
-            public VTSParameter[] defaultParameters;
+            public bool modelLoaded { get; set; }
+            public string modelName { get; set; }
+            public string modelID { get; set; }
+            public VTSParameter[] customParameters { get; set; }
+            public VTSParameter[] defaultParameters { get; set; }
         }
     }
 
@@ -323,7 +325,7 @@ namespace VTS.Models {
             this.messageType = "ParameterValueRequest";
             this.data = new Data();
         }
-        public Data data;
+        public Data data { get; set; }
 
         [System.Serializable]
         public class Data : VTSParameter {}
@@ -335,25 +337,25 @@ namespace VTS.Models {
             this.messageType = "Live2DParameterListRequest";
             this.data = new Data();
         }
-        public Data data;
+        public Data data { get; set; }
 
         [System.Serializable]
         public class Data {
-            public bool modelLoaded;
-            public string modelName;
-            public string modelID;
-            public VTSParameter[] parameters;
+            public bool modelLoaded { get; set; }
+            public string modelName { get; set; }
+            public string modelID { get; set; }
+            public VTSParameter[] parameters { get; set; }
         }
     }
 
     [System.Serializable]
     public class VTSCustomParameter {
         // 4-32 characters, alphanumeric
-        public string parameterName;
-        public string explanation;
-        public float min;
-        public float max;
-        public float defaultValue;
+        public string parameterName { get; set; }
+        public string explanation { get; set; }
+        public float min { get; set; }
+        public float max { get; set; }
+        public float defaultValue { get; set; }
     }
 
     [System.Serializable]
@@ -362,7 +364,7 @@ namespace VTS.Models {
             this.messageType = "ParameterCreationRequest";
             this.data = new Data();
         }
-        public Data data;
+        public Data data { get; set; }
 
         [System.Serializable]
         public class Data : VTSCustomParameter {}
@@ -374,19 +376,19 @@ namespace VTS.Models {
             this.messageType = "ParameterDeletionRequest";
             this.data = new Data();
         }
-        public Data data;
+        public Data data { get; set; }
 
         [System.Serializable]
         public class Data {
-            public string parameterName;
+            public string parameterName { get; set; }
         }
     }
 
     [System.Serializable]
     public class VTSParameterInjectionValue{
-        public string id;
-        public float value = float.MinValue;
-        public float weight = float.MinValue;
+        public string id { get; set; }
+        public float value { get; set; } = float.MinValue;
+        public float weight { get; set; } = float.MinValue;
     }
 
     [System.Serializable]
@@ -395,11 +397,11 @@ namespace VTS.Models {
             this.messageType = "InjectParameterDataRequest";
             this.data = new Data();
         }
-        public Data data;
+        public Data data { get; set; }
 
         [System.Serializable]
         public class Data {
-            public VTSParameterInjectionValue[] parameterValues;
+            public VTSParameterInjectionValue[] parameterValues { get; set; }
         }
     }
 }

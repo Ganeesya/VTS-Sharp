@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
+using System.Text.RegularExpressions;
 using VTS.Models;
 
 namespace VTS.Networking {
-    public class VTSWebSocket : MonoBehaviour
+    public class VTSWebSocket
     {
         private const string VTS_WS_URL = "ws://localhost:8001";
         private IWebSocket _ws = null;
@@ -16,7 +16,7 @@ namespace VTS.Networking {
             this._json = jsonUtility;
         }
 
-        private void Update(){
+        public void Update(){
             ProcessResponses();
         }
 
