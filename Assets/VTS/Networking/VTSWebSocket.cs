@@ -16,6 +16,12 @@ namespace VTS.Networking {
             this._json = jsonUtility;
         }
 
+        public void Close()
+        {
+            _ws.Close();
+        }
+
+
         public void Update(){
             ProcessResponses();
         }

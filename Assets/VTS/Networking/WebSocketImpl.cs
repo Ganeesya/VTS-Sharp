@@ -34,6 +34,12 @@ namespace VTS.Networking.Impl{
             _sendThread.Start();
         }
 
+        public void Close()
+        {
+            _receiveThread.Interrupt();
+            _sendThread.Interrupt();
+        }
+
         public async Task Connect(string URL, System.Action onConnect, System.Action onError)
         {
             Uri serverUri = new Uri(URL);
@@ -77,14 +83,22 @@ namespace VTS.Networking.Impl{
         {
             Debug.Print("WebSocket Message Sender looping.");
             ArraySegment<byte> msg;
-            while (true)
+            try
             {
-                while (!SendQueue.IsCompleted && this.IsConnectionOpen())
+                while (true)
                 {
-                    msg = SendQueue.Take();
-                    // Debug.Print("Dequeued this message to send: " + msg);
-                    await _ws.SendAsync(msg, WebSocketMessageType.Text, true /* is last part of message */, CancellationToken.None);
+                    while (!SendQueue.IsCompleted && this.IsConnectionOpen())
+                    {
+                        msg = SendQueue.Take();
+                        // Debug.Print("Dequeued this message to send: " + msg);
+                        await _ws.SendAsync(msg, WebSocketMessageType.Text, true /* is last part of message */,
+                            CancellationToken.None);
+                    }
                 }
+            }
+            catch (ThreadInterruptedException e)
+            {
+
             }
         }
         #endregion

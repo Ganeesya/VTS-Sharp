@@ -37,5 +37,7 @@ namespace VTS.Networking{
         /// </summary>
         /// <param name="message">The payload to send.</param>
         void Send(string message);
+
+        void Close();
     }
 }
