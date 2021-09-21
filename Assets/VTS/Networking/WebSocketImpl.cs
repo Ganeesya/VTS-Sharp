@@ -94,6 +94,7 @@ namespace VTS.Networking.Impl{
                         await _ws.SendAsync(msg, WebSocketMessageType.Text, true /* is last part of message */,
                             CancellationToken.None);
                     }
+                    Task.Delay(10).Wait();
                 }
             }
             catch (ThreadInterruptedException e)
@@ -137,17 +138,23 @@ namespace VTS.Networking.Impl{
         {
             Debug.Print("WebSocket Message Receiver looping.");
             string result;
-            while (true)
+            try
             {
-                result = await Receive();
-                if (result != null && result.Length > 0)
+                while (true)
                 {
-                    RecieveQueue.Enqueue(result);
+                    result = await Receive();
+                    if (result != null && result.Length > 0)
+                    {
+                        RecieveQueue.Enqueue(result);
+                    }
+                    else
+                    {
+                        Task.Delay(50).Wait();
+                    }
                 }
-                else
-                {
-                    Task.Delay(50).Wait();
-                }
+            }
+            catch (ThreadInterruptedException e)
+            {
             }
         }
         #endregion
