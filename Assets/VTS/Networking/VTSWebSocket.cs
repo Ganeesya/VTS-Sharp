@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using VTS.Models;
 
-namespace VTS.Networking
+namespace VTS.Networking{
     public class VTSWebSocket
     {
         private const string VTS_WS_URL = "ws://localhost:8001";
