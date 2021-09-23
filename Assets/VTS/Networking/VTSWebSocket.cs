@@ -2,15 +2,21 @@
 using System.Collections.Generic;
 using VTS.Models;
 
-namespace VTS.Networking {
+namespace VTS.Networking
     public class VTSWebSocket
     {
         private const string VTS_WS_URL = "ws://localhost:8001";
         private IWebSocket _ws = null;
+
+        // need lock(lockObject) VVVV
         private IJsonUtility _json = null;
         private Dictionary<string, VTSCallbacks> _callbacks = new Dictionary<string, VTSCallbacks>();
+        // need lock(lockObject) AAAA
 
-        public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility){
+        private object lockObject = new object();
+
+        public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility)
+        {
             this._ws = webSocket;
             this._json = jsonUtility;
         }
@@ -29,13 +35,14 @@ namespace VTS.Networking {
             if(this._ws != null && _ws.RecieveQueue.Count > 0){
                 string data;
                 this._ws.RecieveQueue.TryDequeue(out data);
-                if(data == null) return;
-                VTSMessageData response = _json.FromJson<VTSMessageData>(data);
-                lock (this._callbacks)
+                if (data == null) return;
+                lock (lockObject)
                 {
-                    if(!this._callbacks.ContainsKey(response.requestID)) return;
+                    VTSMessageData response = _json.FromJson<VTSMessageData>(data);
+                    if (!this._callbacks.ContainsKey(response.requestID)) return;
 
-                    switch(response.messageType){
+                    switch (response.messageType)
+                    {
                         case "APIError":
                             this._callbacks[response.requestID].onError(_json.FromJson<VTSErrorData>(data));
                             break;
@@ -116,15 +123,19 @@ namespace VTS.Networking {
             }
         }
 
-        public void Send<T>(T request, Action<T> onSuccess, Action<VTSErrorData> onError) where T : VTSMessageData{
-            if(this._ws != null){
-                lock (_callbacks)
+        public void Send<T>(T request, Action<T> onSuccess, Action<VTSErrorData> onError) where T : VTSMessageData
+        {
+            if (this._ws != null)
+            {
+                lock (lockObject)
                 {
                     _callbacks.Add(request.requestID, new VTSCallbacks((t) => { onSuccess((T)t); }, onError));
+                    string output = RemoveNullProps(_json.ToJson(request));
+                    this._ws.Send(output);
                 }
-                string output = RemoveNullProps(_json.ToJson(request));
-                this._ws.Send(output);
-            }else{
+            }
+            else
+            {
                 VTSErrorData error = new VTSErrorData();
                 error.data.errorID = ErrorID.InternalServerError;
                 error.data.message = "No websocket data";
