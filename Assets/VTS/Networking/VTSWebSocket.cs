@@ -32,17 +32,11 @@ namespace VTS.Networking{
         }
 
         private void ProcessResponses(){
-            if(this._ws != null && _ws.RecieveQueue.Count > 0){
-                string data;
-                this._ws.RecieveQueue.TryDequeue(out data);
-                if (data == null) return;
-                lock (lockObject)
-                {
-                    VTSMessageData response = _json.FromJson<VTSMessageData>(data);
-                    if (!this._callbacks.ContainsKey(response.requestID)) return;
-
-                    switch (response.messageType)
-                    {
+            string data = this._ws.GetNextResponse();
+            if(this._ws != null && data != null){
+                VTSMessageData response = _json.FromJson<VTSMessageData>(data);
+                if(this._callbacks.ContainsKey(response.requestID)){
+                    switch(response.messageType){
                         case "APIError":
                             this._callbacks[response.requestID].onError(_json.FromJson<VTSErrorData>(data));
                             break;
@@ -106,36 +100,33 @@ namespace VTS.Networking{
                             error.data.message = "Unable to parse response as valid response type: " + data;
                             this._callbacks[response.requestID].onError(error);
                             break;
+
                     }
                     this._callbacks.Remove(response.requestID);
-
                 }
             }
         }
 
-        public void Connect(System.Action onConnect, System.Action onError){
+        public void Connect(System.Action onConnect, System.Action onDisconnect, System.Action onError){
             if(this._ws != null){
                 #pragma warning disable 
-                this._ws.Connect(VTS_WS_URL, onConnect, onError);
+                this._ws.Start(VTS_WS_URL, onConnect, onDisconnect, onError);
                 #pragma warning restore
             }else{
                 onError();
             }
         }
 
-        public void Send<T>(T request, Action<T> onSuccess, Action<VTSErrorData> onError) where T : VTSMessageData
-        {
-            if (this._ws != null)
-            {
-                lock (lockObject)
-                {
-                    _callbacks.Add(request.requestID, new VTSCallbacks((t) => { onSuccess((T)t); }, onError));
+        public void Send<T>(T request, Action<T> onSuccess, Action<VTSErrorData> onError) where T : VTSMessageData{
+            if(this._ws != null){
+                try{
+                    _callbacks.Add(request.requestID, new VTSCallbacks((t) => { onSuccess((T)t); } , onError));
                     string output = RemoveNullProps(_json.ToJson(request));
                     this._ws.Send(output);
+                }catch(Exception e){
+                    Debug.Log(e);
                 }
-            }
-            else
-            {
+            }else{
                 VTSErrorData error = new VTSErrorData();
                 error.data.errorID = ErrorID.InternalServerError;
                 error.data.message = "No websocket data";

@@ -253,7 +253,7 @@ namespace VTS.Models {
 
     [System.Serializable]
     public class ArtMeshMatcher {
-        public bool tintAll { get; set; }
+        public bool tintAll { get; set; } = true;
         public int[] artMeshNumber { get; set; }
         public string[] nameExact { get; set; }
         public string[] nameContains { get; set; }
