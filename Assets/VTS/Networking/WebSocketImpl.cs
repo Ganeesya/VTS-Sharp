@@ -206,14 +206,21 @@ namespace VTS.Networking.Impl{
             string result;
             while(!token.IsCancellationRequested)
             {
-                result = await Receive(socket, token);
-                if (result != null && result.Length > 0)
+                try
                 {
-                    _receiveQueue.Enqueue(result);
+                    result = await Receive(socket, token);
+                    if (result != null && result.Length > 0)
+                    {
+                        _receiveQueue.Enqueue(result);
+                    }
+                    else
+                    {
+                        await Task.Delay(50);
+                    }
                 }
-                else
+                catch (Exception e)
                 {
-                    await Task.Delay(50);
+                    Debug.Print(e.Message);
                 }
             }
         }
