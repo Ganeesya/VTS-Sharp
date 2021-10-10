@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿// using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Windows.Forms;
 
 namespace VTS.Networking.Impl{
     public class TokenStorageImpl : ITokenStorage
@@ -10,8 +11,8 @@ namespace VTS.Networking.Impl{
         private string _path = "";
 
         public TokenStorageImpl(){
-            this._path = Path.Combine(Application.persistentDataPath, this._fileName);
-            Application.OpenURL(Application.persistentDataPath);
+            this._path = Path.Combine(Application.LocalUserAppDataPath, this._fileName);
+            // Process.Start("EXPLORER.EXE",Application.LocalUserAppDataPath);
         }
         public string LoadToken()
         {

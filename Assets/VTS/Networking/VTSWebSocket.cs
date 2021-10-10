@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using VTS.Models;
 
 namespace VTS.Networking{
@@ -23,7 +24,7 @@ namespace VTS.Networking{
 
         public void Close()
         {
-            _ws.Close();
+            _ws.Stop();
         }
 
 
@@ -124,7 +125,7 @@ namespace VTS.Networking{
                     string output = RemoveNullProps(_json.ToJson(request));
                     this._ws.Send(output);
                 }catch(Exception e){
-                    Debug.Log(e);
+                    Debug.Print(e.Message);
                 }
             }else{
                 VTSErrorData error = new VTSErrorData();

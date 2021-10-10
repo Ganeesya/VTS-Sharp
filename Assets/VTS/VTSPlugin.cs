@@ -56,9 +56,9 @@ namespace VTS {
         /// <param name="onConnect">Callback executed upon successful initialization.</param>
         /// <param name="onDisconnect">Callback executed upon disconnecting from VTS.</param>
         /// <param name="onError">The Callback executed upon failed initialization.</param>
-        public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, Action onConnect, Action onDisconnect, Action onError){
+        public void Initialize(VTSWebSocket vts,IWebSocket webSocket, IJsonUtility jsonUtility, ITokenStorage tokenStorage, Action onConnect, Action onDisconnect, Action onError){
             this._tokenStorage = tokenStorage;
-            this._socket = GetComponent<VTSWebSocket>();
+            this._socket = vts;
             this._socket.Initialize(webSocket, jsonUtility);
             this._socket.Connect(() => {
                 Authenticate(
@@ -67,7 +67,7 @@ namespace VTS {
                         onConnect();
                     }, 
                     (r) => { 
-                        Debug.Log("Token expired, acquiring new token...");
+                        Debug.Print("Token expired, acquiring new token...");
                         this._isAuthenticated = false;
                         tokenStorage.DeleteToken();
                         Authenticate( 

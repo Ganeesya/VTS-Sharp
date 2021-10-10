@@ -35,11 +35,6 @@ namespace VTS.Networking.Impl{
             _sendQueue = new BlockingCollection<ArraySegment<byte>>();
         }
 
-        public void Close()
-        {
-            _receiveThread.Interrupt();
-            _sendThread.Interrupt();
-        }
         ~WebSocketImpl(){
             this.Dispose();
         }
@@ -70,21 +65,21 @@ namespace VTS.Networking.Impl{
 
                 this._onReconnect = onConnect;
                 this._onDisconnect = onDisconnect;
-                Debug.Log("Connecting to: " + serverUri);
+                Debug.Print("Connecting to: " + serverUri);
                 await this._ws.ConnectAsync(serverUri, token);
                 while(IsConnecting())
                 {
-                    Debug.Log("Waiting to connect...");
+                    Debug.Print("Waiting to connect...");
                     await Task.Delay(10);
                 }
-                Debug.Log("Connect status: " + this._ws.State);
+                Debug.Print("Connect status: " + this._ws.State);
                 if(this._ws.State == WebSocketState.Open){
                     onConnect();
                 }else{
                     onError();
                 }
             }catch(Exception e){
-                Debug.LogError(e);
+                Debug.Print(e.Message);
             }
         }
 
@@ -92,7 +87,7 @@ namespace VTS.Networking.Impl{
             this._onDisconnect();
             await Start(this._url, this._onReconnect, this._onDisconnect, async () => { 
                 // keep retrying 
-                Debug.LogError("Reconnect failed, trying again!");
+                Debug.Print("Reconnect failed, trying again!");
                 await Task.Delay(2);
                 await Reconnect();
             } );
@@ -104,7 +99,7 @@ namespace VTS.Networking.Impl{
         }
 
         private void Dispose(){
-            Debug.LogWarning("Disposing of socket...");
+            Debug.Print("Disposing of socket...");
             this._tokenSource.Cancel();
         }
         #endregion
@@ -133,7 +128,7 @@ namespace VTS.Networking.Impl{
         private async void RunSend(ClientWebSocket socket, CancellationToken token)
         {
             Debug.Print("WebSocket Message Sender looping.");
-            ArraySegment<byte> msg;
+            ArraySegment<byte> msg = null;
             // int counter = 0;
             while(!token.IsCancellationRequested)
             {
@@ -148,22 +143,22 @@ namespace VTS.Networking.Impl{
                         msg = _sendQueue.Take();
                         await socket.SendAsync(msg, WebSocketMessageType.Text, true /* is last part of message */, token);
                     }catch(Exception e){
-                        Debug.LogError(e);
+                        Debug.Print(e.Message);
                         // put unsent messages back on the queue
-                        _sendQueue.Add(msg);
+                        if (msg != null)
+                        {
+                            _sendQueue.Add(msg);
+                        }
+
                         if(e is WebSocketException 
-                        || e is System.IO.IOException 
-                        || e is System.Net.Sockets.SocketException){
-                            Debug.LogWarning("Socket exception occured, reconnecting...");
+                           || e is IOException 
+                           || e is System.Net.Sockets.SocketException){
+                            Debug.Print("Socket exception occured, reconnecting...");
                             await Reconnect();
                         }
                     }
                 }
                 await Task.Delay(2);
-            }
-            catch (ThreadInterruptedException e)
-            {
-
             }
         }
         #endregion
@@ -220,9 +215,6 @@ namespace VTS.Networking.Impl{
                 {
                     await Task.Delay(50);
                 }
-            }
-            catch (ThreadInterruptedException e)
-            {
             }
         }
         #endregion
