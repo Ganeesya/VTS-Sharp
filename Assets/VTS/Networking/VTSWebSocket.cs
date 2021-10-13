@@ -29,7 +29,10 @@ namespace VTS.Networking{
 
 
         public void Update(){
-            ProcessResponses();
+            lock (lockObject)
+            {
+                ProcessResponses();
+            }
         }
 
         private void ProcessResponses(){
@@ -123,7 +126,10 @@ namespace VTS.Networking{
                 try{
                     _callbacks.Add(request.requestID, new VTSCallbacks((t) => { onSuccess((T)t); } , onError));
                     string output = RemoveNullProps(_json.ToJson(request));
-                    this._ws.Send(output);
+                    lock (lockObject)
+                    {
+                        this._ws.Send(output);
+                    }
                 }catch(Exception e){
                     Debug.Print(e.Message);
                 }
