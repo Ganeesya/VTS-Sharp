@@ -14,8 +14,6 @@ namespace VTS.Networking{
         private Dictionary<string, VTSCallbacks> _callbacks = new Dictionary<string, VTSCallbacks>();
         // need lock(lockObject) AAAA
 
-        private object lockObject = new object();
-
         public void Initialize(IWebSocket webSocket, IJsonUtility jsonUtility)
         {
             this._ws = webSocket;
@@ -29,10 +27,7 @@ namespace VTS.Networking{
 
 
         public void Update(){
-            lock (lockObject)
-            {
-                ProcessResponses();
-            }
+            ProcessResponses();
         }
 
         private void ProcessResponses(){
@@ -126,10 +121,7 @@ namespace VTS.Networking{
                 try{
                     _callbacks.Add(request.requestID, new VTSCallbacks((t) => { onSuccess((T)t); } , onError));
                     string output = RemoveNullProps(_json.ToJson(request));
-                    lock (lockObject)
-                    {
-                        this._ws.Send(output);
-                    }
+                    this._ws.Send(output);
                 }catch(Exception e){
                     Debug.Print(e.Message);
                 }
@@ -140,7 +132,7 @@ namespace VTS.Networking{
             }
         }
 
-        private string RemoveNullProps(string input){
+        private static string RemoveNullProps(string input){
             string[] props = input.Split(',', '{', '}');
             string output = input;
             foreach(string prop in props){
