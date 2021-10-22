@@ -76,6 +76,9 @@ namespace VTS.Networking{
                         case "ColorTintResponse":
                             this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSColorTintData>(data));
                             break;
+                        case "SceneColorOverlayInfoResponse":
+                            this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSSceneColorOverlayData>(data));
+                            break;
                         case "FaceFoundResponse":
                             this._callbacks[response.requestID].onSuccess(_json.FromJson<VTSFaceFoundData>(data));
                             break;
