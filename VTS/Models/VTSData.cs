@@ -57,6 +57,8 @@ namespace VTS.Models {
             public string pluginDeveloper { get; set; }
             public string pluginIcon { get; set; }
             public string authenticationToken { get; set; }
+            public bool authenticated;
+            public string reason;
         }
     }
 
