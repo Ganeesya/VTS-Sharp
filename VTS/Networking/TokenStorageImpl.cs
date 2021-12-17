@@ -6,13 +6,13 @@ using System.Windows.Forms;
 namespace VTS.Networking.Impl{
     public class TokenStorageImpl : ITokenStorage
     {
-        private static UTF8Encoding ENCODER = new UTF8Encoding();
+        private static readonly UTF8Encoding ENCODER = new UTF8Encoding();
         private string _fileName = "token.json";
         private string _path = "";
 
         public TokenStorageImpl(){
-            this._path = Path.Combine(Application.LocalUserAppDataPath, this._fileName);
-            // Process.Start("EXPLORER.EXE",Application.LocalUserAppDataPath);
+            this._path = Path.Combine(Application.persistentDataPath, this._fileName);
+            // Application.OpenURL(Application.persistentDataPath);
         }
         public string LoadToken()
         {
