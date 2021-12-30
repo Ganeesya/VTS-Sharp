@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
 using VTS.Networking;
 using VTS.Models;
 
@@ -75,31 +76,22 @@ namespace VTS {
             this._socket = vts;
             this._socket.Initialize(webSocket, jsonUtility);
             this._socket.Connect(() => {
-                // get API State
-                GetAPIState(
-                    (s) => {
-                        // If API enabled, authenticate
-                        Authenticate(
-                            (r) => { 
-                                if(!r.data.authenticated){
-                                    Reauthenticate(onConnect, onError);
-                                }else{
-                                    this._isAuthenticated = true;
-                                    onConnect();
-                                }
-                            }, 
-                            (r) => { 
-                                // If initial authentication fails, try again
-                                // (Likely just needs fresh token)
-                                Reauthenticate(onConnect, onError); 
-                            }
-                        );
-                    },
-                (s) => {
-                    // If API is not enabled, invoke Error handler
-                    this._isAuthenticated = false;
-                    onError();
-                });
+                // If API enabled, authenticate
+                Authenticate(
+                    (r) => { 
+                        if(!r.data.authenticated){
+                            Reauthenticate(onConnect, onError);
+                        }else{
+                            this._isAuthenticated = true;
+                            onConnect();
+                        }
+                    }, 
+                    (r) => { 
+                        // If initial authentication fails, try again
+                        // (Likely just needs fresh token)
+                        Reauthenticate(onConnect, onError); 
+                    }
+                );
             },
             () => {
                 this._isAuthenticated = false;
@@ -168,6 +160,31 @@ namespace VTS {
             authRequest.data.pluginDeveloper = this._pluginAuthor;
             authRequest.data.authenticationToken = this._token;
             this._socket.Send<VTSAuthData>(authRequest, onSuccess, onError);
+        }
+
+        #endregion
+
+        #region Port Discovery
+
+        /// <summary>
+        /// Gets a dictionary indexed by port number containing information about all available VTube Studio ports.
+        /// 
+        /// For more info, see 
+        /// <a href="https://github.com/DenchiSoft/VTubeStudio#api-server-discovery-udp">https://github.com/DenchiSoft/VTubeStudio#api-server-discovery-udp</a>
+        /// </summary>
+        /// <returns>Dictionary indexed by port number.</returns>
+        public Dictionary<int, VTSStateBroadcastData> GetPorts(){
+            return this._socket.GetPorts();
+        }
+
+        /// <summary>
+        /// Sets the connection port to the given number. Returns true if the port is a valid VTube Studio port, returns false otherwise. 
+        /// If the port number is changed while an active connection exists, you will need to reconnect.
+        /// </summary>
+        /// <param name="port">The port to connect to.</param>
+        /// <returns>True if the port is a valid VTube Studio port, False otherwise.</returns>
+        public bool SetPort(int port){
+            return this._socket.SetPort(port);
         }
 
         #endregion
