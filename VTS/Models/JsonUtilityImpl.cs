@@ -29,7 +29,7 @@ namespace VTS.Models.Impl{
                 if(pair.Length > 1){
                     float nullable = 0.0f;
                     float.TryParse(pair[1], out nullable);
-                    if(float.MinValue.Equals(nullable)){
+                    if("NaN".Equals(pair[1]) || float.MinValue.Equals(nullable)){
                         output = output.Replace(prop+",", "");
                         output = output.Replace(prop, "");
                     }

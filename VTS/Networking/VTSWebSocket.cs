@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 
 using System.Text;
+using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
@@ -75,7 +76,11 @@ namespace VTS.Networking{
         private void StartUDP(){
             try{
                 if(UDP_CLIENT == null){
-                    UDP_CLIENT = new UdpClient(47779);
+                    // This configuration should prevent the UDP client from blocking other connections to the port
+                    IPEndPoint LOCAL_PT = new IPEndPoint(IPAddress.Any, 47779);
+                    UDP_CLIENT = new UdpClient();
+                    UDP_CLIENT.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                    UDP_CLIENT.Client.Bind(LOCAL_PT);
                 }
             }catch(Exception e){
                 Debug.LogError(e);
