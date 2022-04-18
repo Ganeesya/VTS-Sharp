@@ -8,6 +8,11 @@ namespace VTS.Models.Impl{
     {
         public T FromJson<T>(string json)
         {
+            if(IsMessageType(json, "HotkeysInCurrentModelResponse")){
+                json = ReplaceStringWithEnum<HotkeyAction>(json, "type");
+            }else if(IsMessageType(json, "APIError")){
+                json = ReplaceStringWithEnum<ErrorID>(json, "type");
+            }
             return JsonSerializer.Deserialize<T>(json);
         }
 
@@ -15,6 +20,31 @@ namespace VTS.Models.Impl{
         {
             string json = UnityEngine.JsonUtility.ToJson(obj);
             return RemoveNullProps(json);
+        }
+
+        private bool IsMessageType(string json, string messageType)
+        {
+            return json.Contains(string.Format("\"messageType\":\"{0}\"", messageType));
+        }
+
+        /// <summary>
+        /// Helper function to replace enum names with underyling values.
+        /// </summary>
+        /// <param name="json">json to inspect</param>
+        /// <param name="fieldName">Field name to inspect</param>
+        /// <typeparam name="T">Enum type to replace</typeparam>
+        /// <returns>The modified json</returns>
+        private string ReplaceStringWithEnum<T>(string json, string fieldName) where T : System.Enum
+        {
+            System.Type underlyingType = System.Enum.GetUnderlyingType(typeof(T));
+            foreach(T entry in System.Enum.GetValues(typeof(T))){
+                object value = System.Convert.ChangeType(entry, underlyingType);
+                string name = System.Enum.GetName(typeof(T), entry);
+                json = json.Replace(
+                    string.Format("\"{0}\":\"{1}\"", fieldName, name), 
+                    string.Format("\"{0}\":\"{1}\"", fieldName, value));
+            }
+            return json;
         }
 
         private string RemoveNullProps(string input){
