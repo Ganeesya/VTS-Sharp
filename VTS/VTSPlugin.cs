@@ -13,7 +13,6 @@ namespace VTS {
     {
         #region Properties
 
-        [SerializeField]
         protected string _pluginName = "ExamplePlugin";
         /// <summary>
         /// The name of this plugin. Required for authorization purposes..
@@ -22,18 +21,17 @@ namespace VTS {
         public string PluginName { get { return this._pluginName; } }
 
         protected string _pluginAuthor = "ExampleAuthor";
-        /// <summary>
-        /// The name of this plugin's author. Required for authorization purposes.
-        /// </summary>
-        /// <value></value>
-        public string PluginAuthor { get { return this._pluginAuthor; } }
-        [SerializeField]
-        protected Texture2D _pluginIcon = null;
-        /// <summary>
-        /// The icon for this plugin.
-        /// </summary>
-        /// <value></value>
-        public Texture2D PluginIcon { get { return this._pluginIcon; } }
+        // /// <summary>
+        // /// The name of this plugin's author. Required for authorization purposes.
+        // /// </summary>
+        // /// <value></value>
+        // public string PluginAuthor { get { return this._pluginAuthor; } }
+        // protected Texture2D _pluginIcon = null;
+        // /// <summary>
+        // /// The icon for this plugin.
+        // /// </summary>
+        // /// <value></value>
+        // public Texture2D PluginIcon { get { return this._pluginIcon; } }
 
         private VTSWebSocket _socket = null;
         /// <summary>
@@ -135,7 +133,7 @@ namespace VTS {
         }
 
         private void Reauthenticate(Action onConnect, Action onError){
-            Debug.LogWarning("Token expired, acquiring new token...");
+            Debug.Print("Token expired, acquiring new token...");
             this._isAuthenticated = false;
             this._tokenStorage.DeleteToken();
             Authenticate( 
@@ -154,7 +152,7 @@ namespace VTS {
             VTSAuthData tokenRequest = new VTSAuthData();
             tokenRequest.data.pluginName = this._pluginName;
             tokenRequest.data.pluginDeveloper = this._pluginAuthor;
-            tokenRequest.data.pluginIcon = EncodeIcon(this._pluginIcon);
+            // tokenRequest.data.pluginIcon = EncodeIcon(this._pluginIcon);
             this._socket.Send<VTSAuthData, VTSAuthData>(tokenRequest,
             (a) => {
                 this._token = a.data.authenticationToken; 
@@ -264,7 +262,7 @@ namespace VTS {
         public void GetCurrentModel(Action<VTSCurrentModelData> onSuccess, Action<VTSErrorData> onError){
             VTSCurrentModelData request = new VTSCurrentModelData();
             Debug.Print(request.ToString());
-            this._socket.Send<VTSCurrentModelData>(request, onSuccess, onError);
+            this._socket.Send<VTSCurrentModelData,VTSCurrentModelData>(request, onSuccess, onError);
         }
 
         /// <summary>
@@ -399,7 +397,10 @@ namespace VTS {
         public void TintArtMesh(ColorTint tint, float mixWithSceneLightingColor,  ArtMeshMatcher matcher, Action<VTSColorTintData> onSuccess, Action<VTSErrorData> onError){
             VTSColorTintData request = new VTSColorTintData();
             ArtMeshColorTint colorTint = new ArtMeshColorTint();
-            colorTint.FromColor32(tint);
+            colorTint.colorA = tint.colorA;
+            colorTint.colorR = tint.colorR;
+            colorTint.colorG = tint.colorG;
+            colorTint.colorB = tint.colorB;
             colorTint.mixWithSceneLightingColor = System.Math.Min(1, System.Math.Max(mixWithSceneLightingColor, 0));
             request.data.colorTint = colorTint;
             request.data.artMeshMatcher = matcher;
@@ -969,18 +970,18 @@ namespace VTS {
 
         }
 
-        private static string EncodeIcon(Texture2D icon){
-            try{
-                if(icon.width != 128 && icon.height != 128){
-                    Debug.LogWarning("Icon resolution must be exactly 128*128 pixels!");
-                    return null;
-                }
-                return Convert.ToBase64String(icon.EncodeToPNG());
-            }catch(Exception e){
-                Debug.LogError(e);
-            }
-            return null;
-        }
+        // private static string EncodeIcon(Texture2D icon){
+        //     try{
+        //         if(icon.width != 128 && icon.height != 128){
+        //             Debug.Print("Icon resolution must be exactly 128*128 pixels!");
+        //             return null;
+        //         }
+        //         return Convert.ToBase64String(icon.EncodeToPNG());
+        //     }catch(Exception e){
+        //         Debug.Print(e.Message);
+        //     }
+        //     return null;
+        // }
 
         private static string InjectParameterModeToString(VTSInjectParameterMode mode){
             if(mode == VTSInjectParameterMode.ADD){
@@ -1006,15 +1007,6 @@ namespace VTS {
                 return "zip";
             }
             return "linear";
-        }
-
-        /// <summary>
-        /// Converts the VTS Pair struct to a Unity Vector2 struct.
-        /// </summary>
-        /// <param name="pair">The Pair to convert</param>
-        /// <returns></returns>
-        public static Vector2 PairToVector2(Pair pair){
-            return new Vector2(pair.x, pair.y);
         }
 
         #endregion

@@ -94,7 +94,7 @@ namespace VTS.Networking{
                     UDP_CLIENT.Client.Bind(LOCAL_PT);
                 }
             }catch(Exception e){
-                Debug.LogError(e);
+                Debug.Print(e.Message);
             }
         }
         

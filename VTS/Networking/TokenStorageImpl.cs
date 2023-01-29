@@ -11,8 +11,8 @@ namespace VTS.Networking.Impl{
         private string _path = "";
 
         public TokenStorageImpl(){
-            this._path = Path.Combine(Application.persistentDataPath, this._fileName);
-            // Application.OpenURL(Application.persistentDataPath);
+            this._path = Path.Combine(Application.LocalUserAppDataPath, this._fileName);
+            // Application.OpenURL(Application.LocalUserAppDataPath);
         }
         public string LoadToken()
         {

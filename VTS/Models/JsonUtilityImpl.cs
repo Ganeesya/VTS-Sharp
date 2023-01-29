@@ -18,7 +18,7 @@ namespace VTS.Models.Impl{
 
         public string ToJson(object obj)
         {
-            string json = UnityEngine.JsonUtility.ToJson(obj);
+            string json = JsonSerializer.Serialize(obj);
             return RemoveNullProps(json);
         }
 
