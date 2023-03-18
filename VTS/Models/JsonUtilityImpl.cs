@@ -1,7 +1,4 @@
-﻿using System.Runtime.Serialization.Json;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
+﻿using Newtonsoft.Json;
 
 namespace VTS.Models.Impl{
     public class JsonUtilityImpl : IJsonUtility
@@ -13,12 +10,12 @@ namespace VTS.Models.Impl{
             }else if(IsMessageType(json, "APIError")){
                 json = ReplaceStringWithEnum<ErrorID>(json, "type");
             }
-            return JsonSerializer.Deserialize<T>(json);
+            return JsonConvert.DeserializeObject<T>(json);
         }
 
         public string ToJson(object obj)
         {
-            string json = JsonSerializer.Serialize(obj);
+            string json = JsonConvert.SerializeObject(obj);
             return RemoveNullProps(json);
         }
 

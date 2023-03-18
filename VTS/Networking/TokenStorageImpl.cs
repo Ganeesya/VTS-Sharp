@@ -1,7 +1,9 @@
 ﻿// using System.Diagnostics;
+
+using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
-using System.Windows.Forms;
 
 namespace VTS.Networking.Impl{
     public class TokenStorageImpl : ITokenStorage
@@ -10,8 +12,9 @@ namespace VTS.Networking.Impl{
         private string _fileName = "token.json";
         private string _path = "";
 
-        public TokenStorageImpl(){
-            this._path = Path.Combine(Application.LocalUserAppDataPath, this._fileName);
+        public TokenStorageImpl(string dirPath)
+        {
+            this._path = Path.Combine(dirPath, this._fileName);
             // Application.OpenURL(Application.LocalUserAppDataPath);
         }
         public string LoadToken()
@@ -24,6 +27,11 @@ namespace VTS.Networking.Impl{
 
         public void SaveToken(string token)
         {
+            string dirPath = Path.GetDirectoryName(_path);
+            if (!File.Exists(dirPath))
+            {
+                Directory.CreateDirectory(dirPath);
+            }
             File.WriteAllText(this._path, token, ENCODER);
         }
 

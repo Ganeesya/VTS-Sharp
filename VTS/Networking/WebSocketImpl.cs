@@ -129,7 +129,7 @@ namespace VTS.Networking.Impl{
         private async void RunSend(ClientWebSocket socket, CancellationToken token)
         {
             Debug.Print("WebSocket Message Sender looping.");
-            ArraySegment<byte> msg = null;
+            ArraySegment<byte> msg;
             // int counter = 0;
             while(!token.IsCancellationRequested)
             {
